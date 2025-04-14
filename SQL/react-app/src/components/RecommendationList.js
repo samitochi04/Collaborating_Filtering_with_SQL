@@ -8,12 +8,12 @@ function RecommendationList({ title, items }) {
         <ul>
           {items.map((item, index) => (
             <li key={index}>
-              Item ID: {item.item_id} (Frequency: {item.frequency})
+              ID Item: {item.item_id} (Fréquence: {item.frequency})
             </li>
           ))}
         </ul>
       ) : (
-        <p>No recommendations available</p>
+        <p>Aucune recommandation disponible</p>
       )}
     </div>
   );

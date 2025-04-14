@@ -16,11 +16,11 @@ function ItemSearch({ onSearch }) {
         type="number"
         value={itemId}
         onChange={(e) => setItemId(e.target.value)}
-        placeholder="Enter Item ID"
+        placeholder="Entrez l'ID de l'item"
         min="1"
         required
       />
-      <button type="submit">Get Recommendations</button>
+      <button type="submit">Recommendations</button>
     </form>
   );
 }

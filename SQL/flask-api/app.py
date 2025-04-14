@@ -27,7 +27,7 @@ def get_recommendations_by_viewed(item_id):
         WHERE p.item_id != :item_id
         GROUP BY p.item_id
         ORDER BY frequency DESC
-        LIMIT 5;
+        LIMIT 10;
         """
         
         # Execute query and log results for debugging
@@ -65,12 +65,41 @@ def get_recommendations_by_purchased(item_id):
         WHERE p2.item_id != :item_id
         GROUP BY p2.item_id
         ORDER BY frequency DESC
-        LIMIT 5;
+        LIMIT 10;
         """
         
         result = db.session.execute(query, {'item_id': item_id})
         recommendations = [{'item_id': row[0], 'frequency': int(row[1])} for row in result]
         print(f"Found recommendations: {recommendations}")
+        
+        return jsonify(recommendations)
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/recommendations/combined/<int:item_id>')
+def get_recommendations_combined(item_id):
+    try:
+        print(f"Received combined recommendation request for item_id: {item_id}")
+        
+        query = """
+        WITH combined_sessions AS (
+            SELECT session_id FROM sessions WHERE item_id = :item_id
+            UNION
+            SELECT CAST(session_id AS VARCHAR) FROM purchases WHERE item_id = :item_id
+        )
+        SELECT p.item_id, COUNT(*) as frequency
+        FROM combined_sessions cs
+        LEFT JOIN purchases p ON cs.session_id = p.session_id
+        WHERE p.item_id != :item_id AND p.item_id IS NOT NULL
+        GROUP BY p.item_id
+        ORDER BY frequency DESC
+        LIMIT 10;
+        """
+        
+        result = db.session.execute(query, {'item_id': item_id})
+        recommendations = [{'item_id': row[0], 'frequency': int(row[1])} for row in result]
+        print(f"Found combined recommendations: {recommendations}")
         
         return jsonify(recommendations)
     except Exception as e:
